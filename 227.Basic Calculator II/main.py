@@ -33,57 +33,71 @@ def calculate(s):
 		return int(s)
 	else:
 		
-		oprL = []  #存放操作符栈
-		nblL = []  #存放逆波兰表达式
+		S1 = ['&']  #操作符栈1  
+		S2 = []  #操作数栈2
+		S3 = []  #运算栈
+		tempChar = ''
 		for char in s:
-
-			#为长度零直接入操作符栈
-			if len(oprL)==0:
-				oprL.append(char)
+			if isOpr(char):
+				S2.append(tempChar)
+				tempChar=''
+				do_result(S1,S2,char)
 			else:
-				# 比较当前元素和栈顶元素的优先级,如果当前元素的优先级小于栈顶，则直接入栈，如果大于或等于就把操作符栈的第一个元素append到逆波兰表达式的后面，直到当前元素的优先级大于栈顶或者栈为空
-				if oprLevel(char)>=oprLevel(oprL[0]):
-					oprL.insert(0, char)
+				tempChar+=char
+		S2.append(tempChar)
+		for i in S1:
+			S2.append(i)
+		S2.pop(-1)
+		print(S2)
+		for i in S2:
+			if isOpr(i):
+				a = S3.pop(0)
+				b = S3.pop(0)
+				if i == '+':
+					res = add(b, a)
+				elif i == '-':
+					res = sub(b, a)
+				elif i == '*':
+					res = mul(b, a)
 				else:
-					tempO = oprL.pop(0)
-					oprL.insert(0, char)
-		print('oprL:',oprL)
-		print('nblL:',nblL)
-		# res = 0
-		# for i in list(range(len(nblL))):
-		# 	if i==0:
-		# 		a = oprL[-1]
-		# 		b = oprL[-2]
-		# 		if nblL[i] == '+':
-		# 			res = add(a, b)
-		# 		elif nblL[i] == '-':
-		# 			res = sub(a, b)
-		# 		elif nblL[i] == '*':
-		# 			res = mul(a, b)
-		# 		else:
-		# 			res = div(a, b)
-		# 	else:
-		# 		c = oprL[-2-i]
-		# 		if nblL[i] == '+':
-		# 			res = add(res, c)
-		# 		elif nblL[i] == '-':
-		# 			res = sub(res, c)
-		# 		elif nblL[i] == '*':
-		# 			res = mul(res, c)
-		# 		else:
-		# 			res = div(res, c)
-		# return res
+					res = div(b, a)
+				S3.insert(0,res)
+			else:
+				S3.insert(0,i)
 
 		
+		return S3.pop(0)
+
+
+
+
+
+#递归
+def do_result(S1,S2,currentChar):
+	top = S1[0]
+	if oprLevel(currentChar) > oprLevel(top):
+		S1.insert(0, currentChar)
+	else:
+		tempO = S1.pop(0)
+		S2.append(tempO)
+		do_result(S1,S2,currentChar)
+
 	
+# 判断是否是操作符
+def isOpr(charS):
 	
-			
+	if charS=='+' or charS=='-' or charS=='*' or charS=='/':
+		return True
+	else:
+		return False
 
 def oprLevel(oprS):
 	if oprS == '+' or oprS == '-':
 		return 1
 	elif oprS =='*' or oprS == '/':
 		return 2
+	elif oprS == '&':
+		return -1
 	else:
 		return 0
 
@@ -100,4 +114,4 @@ def div (a,b):
 	return int(a)//int(b)
 
 if __name__=='__main__':
-	print(calculate('3*5+2'))
+	print(calculate('31+5*2'))
